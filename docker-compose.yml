@@ -1,0 +1,24 @@
+version: '2.0'
+services:
+  web:
+    build: .
+    depends_on:
+      - pgbouncer
+  pgbouncer:
+    image: pgbouncer/pgbouncer
+    ports:
+      - "6432:6432"
+    environment:
+      - DATABASES_HOST=postgres
+      - DATABASES_USER=postgres
+      - DATABASES_PASSWORD=secret
+      - DATABASES_POOL_SIZE=5
+      - PGBOUNCER_POOL_MODE=transaction
+      - PGBOUNCER_MAX_CLIENT_CONN=100
+      - PGBOUNCER_DEFAULT_POOL_SIZE=20
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=secret
