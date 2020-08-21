@@ -2,7 +2,7 @@ Query cancellation problem
 ==========================
 
 pgx/v4 does not work as expected with pgbouncer due to
-query cancellation. In order to replicate:
+query cancellation ([issue #679](https://github.com/jackc/pgx/issues/679)). In order to replicate:
 
 1. `docker-compose up`
 2. `echo "show pools;" | psql -h localhost -p 6432 -U postgres pgbouncer`
