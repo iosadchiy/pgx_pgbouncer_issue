@@ -64,7 +64,7 @@ func (res *Resource) Destroy() {
 	if res.status != resourceStatusAcquired {
 		panic("tried to destroy resource that is not acquired")
 	}
-	res.pool.destroyAcquiredResource(res)
+	go res.pool.destroyAcquiredResource(res)
 }
 
 // Hijack assumes ownership of the resource from the pool. Caller is responsible
@@ -400,6 +400,7 @@ func (p *Pool) CreateResource(ctx context.Context) error {
 		value:        value,
 		lastUsedNano: nanotime(),
 	}
+	p.destructWG.Add(1)
 
 	p.cond.L.Lock()
 	// If closed while constructing resource then destroy it and return an error
@@ -409,7 +410,6 @@ func (p *Pool) CreateResource(ctx context.Context) error {
 	}
 	p.allResources = append(p.allResources, res)
 	p.idleResources = append(p.idleResources, res)
-	p.destructWG.Add(1)
 	p.cond.L.Unlock()
 
 	return nil
@@ -435,11 +435,9 @@ func (p *Pool) releaseAcquiredResource(res *Resource, lastUsedNano int64) {
 // Remove removes res from the pool and closes it. If res is not part of the
 // pool Remove will panic.
 func (p *Pool) destroyAcquiredResource(res *Resource) {
+	p.destructResourceValue(res.value)
 	p.cond.L.Lock()
-
 	p.allResources = removeResource(p.allResources, res)
-	go p.destructResourceValue(res.value)
-
 	p.cond.L.Unlock()
 	p.cond.Signal()
 }
