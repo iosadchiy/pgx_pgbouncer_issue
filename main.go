@@ -2,24 +2,24 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"sync"
 	"time"
 
-	"github.com/jackc/pgx/v4/pgxpool"
+	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
-func NewDatabasePool(ctx context.Context) (*pgxpool.Pool, error) {
-	s := "host=pgbouncer port=6432 user=postgres password=secret dbname=postgres pool_max_conns=10"
-	c, err := pgxpool.ParseConfig(s)
+const connstring = "host=pgbouncer  port=6432 user=postgres password=secret dbname=postgres sslmode=disable statement_cache_mode=describe"
+
+func NewDatabasePool() (*sql.DB, error) {
+	db, err := sql.Open("pgx", connstring)
 	if err != nil {
-		panic("failed to parse postgres config: " + err.Error())
+		return db, err
 	}
-
-	c.MaxConns = 10
-	c.ConnConfig.TLSConfig = nil
-
-	return pgxpool.ConnectConfig(ctx, c)
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(10)
+	return db, nil
 }
 
 func main() {
@@ -33,10 +33,11 @@ func main() {
 func run() error {
 	ctx := context.Background()
 
-	db, err := NewDatabasePool(ctx)
+	db, err := NewDatabasePool()
 	if err != nil {
 		return err
 	}
+	defer db.Close()
 
 	wg := &sync.WaitGroup{}
 	for i := 0; i < 100; i++ {
@@ -48,18 +49,17 @@ func run() error {
 	return nil
 }
 
-func worker(ctx context.Context, db *pgxpool.Pool, wg *sync.WaitGroup) {
+func worker(ctx context.Context, db *sql.DB, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for {
 		handle(ctx, db)
 	}
 }
 
-func handle(ctx context.Context, db *pgxpool.Pool) {
+func handle(ctx context.Context, db *sql.DB) {
 	ctx, cancel := context.WithTimeout(ctx, 10 * time.Millisecond)
 	defer cancel()
 
 	q := `select pg_sleep(10)`
-	rows, _ := db.Query(ctx, q)
-	defer rows.Close()
+	_, _ = db.ExecContext(ctx, q)
 }
