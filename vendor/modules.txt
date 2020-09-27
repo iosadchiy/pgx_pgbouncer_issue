@@ -1,7 +1,6 @@
 # github.com/jackc/chunkreader/v2 v2.0.1
 github.com/jackc/chunkreader/v2
-# github.com/jackc/pgconn v1.6.5-0.20200821030840-fdfc783345f6
-## explicit
+# github.com/jackc/pgconn v1.7.0
 github.com/jackc/pgconn
 github.com/jackc/pgconn/internal/ctxwatch
 github.com/jackc/pgconn/stmtcache
@@ -9,19 +8,17 @@ github.com/jackc/pgconn/stmtcache
 github.com/jackc/pgio
 # github.com/jackc/pgpassfile v1.0.0
 github.com/jackc/pgpassfile
-# github.com/jackc/pgproto3/v2 v2.0.4
+# github.com/jackc/pgproto3/v2 v2.0.5
 github.com/jackc/pgproto3/v2
 # github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b
 github.com/jackc/pgservicefile
-# github.com/jackc/pgtype v1.4.2
+# github.com/jackc/pgtype v1.5.0
 github.com/jackc/pgtype
-# github.com/jackc/pgx/v4 v4.8.1
+# github.com/jackc/pgx/v4 v4.9.0
 ## explicit
 github.com/jackc/pgx/v4
 github.com/jackc/pgx/v4/internal/sanitize
 github.com/jackc/pgx/v4/stdlib
-# github.com/jackc/puddle v1.1.2-0.20200821025810-91d0159cc97a
-## explicit
 # golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 ## explicit
 golang.org/x/crypto/pbkdf2
